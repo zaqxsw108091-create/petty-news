@@ -1,4 +1,5 @@
 import { createRoute } from '@granite-js/react-native';
+import { saveBase64Data, share } from '@apps-in-toss/native-modules';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   AccessibilityInfo,
@@ -8,8 +9,10 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from 'react-native';
+import { ShareCard, type ShareCardHandle } from 'components/ShareCard';
 import { ANCHOR_NAME, ANCHOR_TITLE, CHANNEL_NAME, type Article, type Category } from 'data/news';
 
 export const Route = createRoute('/article', {
@@ -36,7 +39,10 @@ function formatTime(date: Date): string {
   return `${hours}:${minutes}`;
 }
 
+type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
+
 function Page() {
+  const navigation = Route.useNavigation();
   const article = Route.useParams();
   const publishedAt = formatTime(new Date(Number(article.id)));
 
@@ -49,6 +55,39 @@ function Page() {
   const tickerTranslateX = useRef(new Animated.Value(0)).current;
   const [tickerContainerWidth, setTickerContainerWidth] = useState(0);
   const [tickerContentWidth, setTickerContentWidth] = useState(0);
+
+  const shareCardRef = useRef<ShareCardHandle>(null);
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
+
+  const handleSaveAndShare = () => {
+    const svg = shareCardRef.current;
+    if (!svg || saveStatus === 'saving') return;
+
+    setSaveStatus('saving');
+    svg.toDataURL(async (base64) => {
+      try {
+        await saveBase64Data({
+          data: base64,
+          fileName: `pettynews-${article.id}.png`,
+          mimeType: 'image/png',
+        });
+        setSaveStatus('saved');
+        // 공유 시트는 곁들이는 기능이라, 사용자가 취소하거나 네트워크가 없어도
+        // 이미지 저장 자체는 이미 끝났으므로 조용히 무시한다 (SPEC 8.3과 같은 원칙)
+        try {
+          await share({ message: `${article.headline} — ${CHANNEL_NAME}` });
+        } catch {
+          // ignore
+        }
+      } catch {
+        setSaveStatus('error');
+      }
+    });
+  };
+
+  const handleOpenArchive = () => {
+    navigation.navigate('/archive');
+  };
 
   useEffect(() => {
     let mounted = true;
@@ -190,14 +229,27 @@ function Page() {
         <Text style={styles.tickerArrow}>◀</Text>
       </View>
 
+      {saveStatus === 'saved' && <Text style={styles.saveNotice}>이미지를 저장했어요.</Text>}
+      {saveStatus === 'error' && <Text style={styles.saveNotice}>저장에 실패했어요. 다시 시도해주세요.</Text>}
+
       <View style={styles.actionRow}>
-        {/* 이미지 저장/보관함은 5.5, 이미지 저장 기능 구현 시 연결한다 */}
-        <View style={[styles.actionButton, styles.actionButtonDisabled]}>
-          <Text style={styles.actionButtonText}>이미지로 저장</Text>
-        </View>
-        <View style={[styles.actionButton, styles.actionButtonDisabled]}>
+        <TouchableOpacity
+          style={[styles.actionButton, saveStatus === 'saving' && styles.actionButtonDisabled]}
+          onPress={handleSaveAndShare}
+          disabled={saveStatus === 'saving'}
+          activeOpacity={0.7}
+        >
+          <Text style={styles.actionButtonText}>{saveStatus === 'saving' ? '저장 중…' : '저장하고 공유하기'}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.actionButton} onPress={handleOpenArchive} activeOpacity={0.7}>
           <Text style={styles.actionButtonText}>보관함</Text>
-        </View>
+        </TouchableOpacity>
+      </View>
+
+      {/* 화면 캡처 API가 없어 react-native-svg의 Svg.toDataURL()로 별도 카드 이미지를 만든다.
+          화면 밖에 그려두고 저장 시점에만 참조한다 */}
+      <View style={styles.hiddenCapture} pointerEvents="none">
+        <ShareCard ref={shareCardRef} article={article} />
       </View>
     </SafeAreaView>
   );
@@ -307,6 +359,13 @@ const styles = StyleSheet.create({
     fontSize: 13,
     alignSelf: 'flex-start',
   },
+  saveNotice: {
+    marginTop: 12,
+    marginHorizontal: 20,
+    fontSize: 13,
+    color: '#666666',
+    textAlign: 'center',
+  },
   actionRow: {
     flexDirection: 'row',
     gap: 12,
@@ -326,5 +385,11 @@ const styles = StyleSheet.create({
   actionButtonText: {
     fontWeight: 'bold',
     color: '#000000',
+  },
+  hiddenCapture: {
+    position: 'absolute',
+    top: -100000,
+    left: 0,
+    opacity: 0,
   },
 });
