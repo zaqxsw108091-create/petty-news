@@ -418,10 +418,10 @@ export interface LastPicks {
 /** 직전 인덱스를 피해서 무작위로 하나 고른다 */
 function pick<T>(list: T[], avoid?: number): { value: T; index: number } {
   if (list.length === 0) throw new Error('empty list');
-  if (list.length === 1) return { value: list[0], index: 0 };
+  if (list.length === 1) return { value: list[0]!, index: 0 };
   let i = Math.floor(Math.random() * list.length);
   if (i === avoid) i = (i + 1 + Math.floor(Math.random() * (list.length - 1))) % list.length;
-  return { value: list[i], index: i };
+  return { value: list[i]!, index: i };
 }
 
 function today(): string {
@@ -485,6 +485,6 @@ export function createArticle(
 }
 
 /** 어제 기사로 후속 보도 문구를 만든다 */
-export function createFollowup(yesterday: Article, avoid?: number): string {
+export function createFollowup(_yesterday: Article, avoid?: number): string {
   return pick(FOLLOWUP_LINES, avoid).value;
 }
