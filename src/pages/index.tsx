@@ -1,6 +1,6 @@
 import { createRoute } from '@granite-js/react-native';
 import { useFocusEffect } from '@granite-js/native/@react-navigation/native';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { loadArchive, publishToArchive } from 'data/archive';
 import {
@@ -11,7 +11,9 @@ import {
   CLOSING,
   PRIVACY_NOTE,
   createArticle,
+  createFollowup,
   today,
+  yesterday,
   type Article,
   type Category,
   type LastPicks,
@@ -65,6 +67,14 @@ function Page() {
 
   const todayArticle = archive.find((a) => a.date === todayStr);
 
+  // SPEC 6.4: 어제 기록이 여러 건이면 가장 최근 것 기준. archive는 항상 최신이 앞에 오도록
+  // 저장되므로(publishToArchive), 어제 날짜 중 첫 매치가 곧 가장 최근 기록이다.
+  const yesterdayArticle = archive.find((a) => a.date === yesterday());
+  const followupText = useMemo(
+    () => (yesterdayArticle ? createFollowup(yesterdayArticle) : null),
+    [yesterdayArticle?.id]
+  );
+
   const handleReport = async (category: ReportCategory) => {
     // ref로 동기 잠금을 걸어야 한다: state는 배치되어 연타 시 두 번째 탭도 통과할 수 있다
     if (isPublishingRef.current) return;
@@ -97,6 +107,13 @@ function Page() {
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <Text style={styles.channelName}>{CHANNEL_NAME}</Text>
       <Text style={styles.channelSlogan}>{CHANNEL_SLOGAN}</Text>
+
+      {followupText && (
+        <View style={styles.followup}>
+          <Text style={styles.followupLabel}>어제의 후속 보도</Text>
+          <Text style={styles.followupText}>{followupText}</Text>
+        </View>
+      )}
 
       {todayArticle ? (
         <View style={styles.closing}>
@@ -156,6 +173,24 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#666666',
     marginBottom: 32,
+  },
+  followup: {
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: '#000000',
+    paddingVertical: 14,
+    marginBottom: 24,
+  },
+  followupLabel: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#F04452',
+    marginBottom: 6,
+  },
+  followupText: {
+    fontSize: 14,
+    color: '#000000',
+    lineHeight: 20,
   },
   prompt: {
     fontSize: 16,

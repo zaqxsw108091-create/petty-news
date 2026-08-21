@@ -431,6 +431,14 @@ export function today(): string {
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
 }
 
+/** 로컬 자정 기준 어제 날짜. 후속 보도(6.4) 판정에서 today()와 같은 기준으로 사용한다 */
+export function yesterday(): string {
+  const d = new Date();
+  d.setDate(d.getDate() - 1);
+  const p = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+}
+
 /**
  * 속보 한 건을 조립한다.
  * @param category 카테고리
