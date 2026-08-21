@@ -424,7 +424,8 @@ function pick<T>(list: T[], avoid?: number): { value: T; index: number } {
   return { value: list[i]!, index: i };
 }
 
-function today(): string {
+/** 로컬 자정 기준 오늘 날짜. 오늘 발행 여부 판정 등에서 이 함수 하나만 사용해 기준을 통일한다 */
+export function today(): string {
   const d = new Date();
   const p = (n: number) => String(n).padStart(2, '0');
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;

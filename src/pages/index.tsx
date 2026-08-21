@@ -1,13 +1,18 @@
 import { createRoute } from '@granite-js/react-native';
-import React, { useState } from 'react';
+import { useFocusEffect } from '@granite-js/native/@react-navigation/native';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { loadArchive, publishToArchive } from 'data/archive';
 import {
   CATEGORIES,
   CATEGORY_LABEL,
   CHANNEL_NAME,
   CHANNEL_SLOGAN,
+  CLOSING,
   PRIVACY_NOTE,
   createArticle,
+  today,
+  type Article,
   type Category,
   type LastPicks,
 } from 'data/news';
@@ -24,14 +29,68 @@ for (let i = 0; i < CATEGORIES.length; i += 2) {
   CATEGORY_ROWS.push(CATEGORIES.slice(i, i + 2));
 }
 
+/** 자정을 넘기면 오늘 날짜 문자열을 다시 계산해, 화면을 켜둔 채로 있어도 잠금이 자동으로 풀리게 한다 */
+function useTodayDate(): string {
+  const [todayStr, setTodayStr] = useState(() => today());
+
+  useEffect(() => {
+    const now = new Date();
+    const nextMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 1);
+    const timer = setTimeout(() => setTodayStr(today()), nextMidnight.getTime() - now.getTime());
+    return () => clearTimeout(timer);
+  }, [todayStr]);
+
+  return todayStr;
+}
+
 function Page() {
   const navigation = Route.useNavigation();
   const [lastPicks, setLastPicks] = useState<LastPicks>({});
+  const [archive, setArchive] = useState<Article[]>([]);
+  const [isPublishing, setIsPublishing] = useState(false);
+  const isPublishingRef = useRef(false);
+  const todayStr = useTodayDate();
 
-  const handleReport = (category: ReportCategory) => {
-    const { article, picks } = createArticle(category, lastPicks);
-    setLastPicks(picks);
-    navigation.navigate('/article', article);
+  useFocusEffect(
+    useCallback(() => {
+      let cancelled = false;
+      loadArchive().then((items) => {
+        if (!cancelled) setArchive(items);
+      });
+      return () => {
+        cancelled = true;
+      };
+    }, [])
+  );
+
+  const todayArticle = archive.find((a) => a.date === todayStr);
+
+  const handleReport = async (category: ReportCategory) => {
+    // ref로 동기 잠금을 걸어야 한다: state는 배치되어 연타 시 두 번째 탭도 통과할 수 있다
+    if (isPublishingRef.current) return;
+    const publishDate = today();
+    if (archive.some((a) => a.date === publishDate)) return;
+
+    isPublishingRef.current = true;
+    setIsPublishing(true);
+    try {
+      const { article, picks } = createArticle(category, lastPicks);
+      const nextArchive = await publishToArchive(archive, article);
+      setArchive(nextArchive);
+      setLastPicks(picks);
+      navigation.navigate('/article', article);
+    } finally {
+      isPublishingRef.current = false;
+      setIsPublishing(false);
+    }
+  };
+
+  const handleReview = () => {
+    if (todayArticle) navigation.navigate('/article', todayArticle);
+  };
+
+  const handleOpenArchive = () => {
+    navigation.navigate('/archive');
   };
 
   return (
@@ -39,24 +98,40 @@ function Page() {
       <Text style={styles.channelName}>{CHANNEL_NAME}</Text>
       <Text style={styles.channelSlogan}>{CHANNEL_SLOGAN}</Text>
 
-      <Text style={styles.prompt}>오늘의 제보를 기다립니다</Text>
-
-      <View style={styles.grid}>
-        {CATEGORY_ROWS.map((row, rowIndex) => (
-          <View style={styles.row} key={rowIndex}>
-            {row.map((category) => (
-              <TouchableOpacity
-                key={category}
-                style={styles.reportButton}
-                onPress={() => handleReport(category)}
-                activeOpacity={0.7}
-              >
-                <Text style={styles.reportButtonText}>{CATEGORY_LABEL[category]}</Text>
-              </TouchableOpacity>
+      {todayArticle ? (
+        <View style={styles.closing}>
+          <Text style={styles.closingLine}>{CLOSING.line1}</Text>
+          <Text style={styles.closingLine}>{CLOSING.line2}</Text>
+          <TouchableOpacity style={styles.reviewButton} onPress={handleReview} activeOpacity={0.7}>
+            <Text style={styles.reviewButtonText}>오늘의 속보 다시 보기</Text>
+          </TouchableOpacity>
+        </View>
+      ) : (
+        <>
+          <Text style={styles.prompt}>오늘의 제보를 기다립니다</Text>
+          <View style={styles.grid}>
+            {CATEGORY_ROWS.map((row, rowIndex) => (
+              <View style={styles.row} key={rowIndex}>
+                {row.map((category) => (
+                  <TouchableOpacity
+                    key={category}
+                    style={styles.reportButton}
+                    onPress={() => handleReport(category)}
+                    disabled={isPublishing}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={styles.reportButtonText}>{CATEGORY_LABEL[category]}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
             ))}
           </View>
-        ))}
-      </View>
+        </>
+      )}
+
+      <TouchableOpacity style={styles.archiveLink} onPress={handleOpenArchive} activeOpacity={0.7}>
+        <Text style={styles.archiveLinkText}>지난 속보 보관함</Text>
+      </TouchableOpacity>
 
       <Text style={styles.privacyNote}>{PRIVACY_NOTE}</Text>
     </ScrollView>
@@ -108,8 +183,41 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#000000',
   },
+  closing: {
+    borderWidth: 1,
+    borderColor: '#000000',
+    padding: 24,
+    alignItems: 'center',
+  },
+  closingLine: {
+    fontSize: 14,
+    color: '#000000',
+    textAlign: 'center',
+    marginBottom: 4,
+  },
+  reviewButton: {
+    marginTop: 16,
+    borderWidth: 1,
+    borderColor: '#000000',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+  },
+  reviewButtonText: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#000000',
+  },
+  archiveLink: {
+    marginTop: 24,
+    alignItems: 'center',
+  },
+  archiveLinkText: {
+    fontSize: 14,
+    color: '#333333',
+    textDecorationLine: 'underline',
+  },
   privacyNote: {
-    marginTop: 32,
+    marginTop: 24,
     fontSize: 11,
     color: '#999999',
     textAlign: 'center',
