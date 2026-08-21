@@ -1,6 +1,15 @@
 import { createRoute } from '@granite-js/react-native';
 import React, { useEffect, useRef, useState } from 'react';
-import { AccessibilityInfo, Animated, Easing, SafeAreaView, StyleSheet, Text, View } from 'react-native';
+import {
+  AccessibilityInfo,
+  Animated,
+  Easing,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import { ANCHOR_NAME, ANCHOR_TITLE, CHANNEL_NAME, type Article, type Category } from 'data/news';
 
 export const Route = createRoute('/article', {
@@ -141,24 +150,28 @@ function Page() {
         <Text style={styles.time}>{publishedAt}</Text>
       </View>
 
-      <View style={styles.headlineBlock}>
-        <Text style={styles.headline}>{headline}</Text>
-        <Text style={styles.subtitle}>― {article.subtitle} ―</Text>
-      </View>
+      {/* 헤드라인 길이는 CUSTOM(직접 제보) 40자 입력에 따라 크게 달라질 수 있어
+          스크롤 영역으로 감싸, 하단 티커·버튼이 화면 밖으로 밀려나지 않게 한다 */}
+      <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
+        <View style={styles.headlineBlock}>
+          <Text style={styles.headline}>{headline}</Text>
+          <Text style={styles.subtitle}>― {article.subtitle} ―</Text>
+        </View>
 
-      <View style={styles.commentRow}>
-        <Text style={styles.commentAuthor}>
-          {ANCHOR_ICON} {ANCHOR_TITLE} {ANCHOR_NAME}
-        </Text>
-        <Text style={styles.commentLine}>{article.anchor}</Text>
-      </View>
+        <View style={styles.commentRow}>
+          <Text style={styles.commentAuthor}>
+            {ANCHOR_ICON} {ANCHOR_TITLE} {ANCHOR_NAME}
+          </Text>
+          <Text style={styles.commentLine}>{article.anchor}</Text>
+        </View>
 
-      <View style={styles.commentRow}>
-        <Text style={styles.commentAuthor}>
-          {expertIcon} {article.expertOrg} {article.expertName}
-        </Text>
-        <Text style={styles.commentLine}>{article.expertLine}</Text>
-      </View>
+        <View style={styles.commentRow}>
+          <Text style={styles.commentAuthor}>
+            {expertIcon} {article.expertOrg} {article.expertName}
+          </Text>
+          <Text style={styles.commentLine}>{article.expertLine}</Text>
+        </View>
+      </ScrollView>
 
       <View
         style={styles.tickerRow}
@@ -233,6 +246,12 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#666666',
   },
+  scroll: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+  },
   headlineBlock: {
     padding: 20,
     borderBottomWidth: 1,
@@ -274,7 +293,6 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 12,
     gap: 8,
-    marginTop: 'auto',
   },
   tickerArrow: {
     color: '#FFFFFF',

@@ -4,6 +4,7 @@ import { Route as _AboutRoute } from '../pages/about';
 import { Route as _ArchiveRoute } from '../pages/archive';
 import { Route as _ArticleRoute } from '../pages/article';
 import { Route as _IndexRoute } from '../pages/';
+import { Route as _ReportRoute } from '../pages/report';
 
 declare module '@granite-js/react-native' {
   interface RegisterScreenInput {
@@ -11,6 +12,7 @@ declare module '@granite-js/react-native' {
     '/archive': (typeof _ArchiveRoute)['_inputType'];
     '/article': (typeof _ArticleRoute)['_inputType'];
     '/': (typeof _IndexRoute)['_inputType'];
+    '/report': (typeof _ReportRoute)['_inputType'];
   }
 
   interface RegisterScreen {
@@ -18,5 +20,6 @@ declare module '@granite-js/react-native' {
     '/archive': (typeof _ArchiveRoute)['_outputType'];
     '/article': (typeof _ArticleRoute)['_outputType'];
     '/': (typeof _IndexRoute)['_outputType'];
+    '/report': (typeof _ReportRoute)['_outputType'];
   }
 }

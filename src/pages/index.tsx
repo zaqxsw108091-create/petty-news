@@ -103,6 +103,10 @@ function Page() {
     navigation.navigate('/archive');
   };
 
+  const handleOpenReport = () => {
+    navigation.navigate('/report', { lastPicks });
+  };
+
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <Text style={styles.channelName}>{CHANNEL_NAME}</Text>
@@ -143,6 +147,14 @@ function Page() {
               </View>
             ))}
           </View>
+          <TouchableOpacity
+            style={styles.customButton}
+            onPress={handleOpenReport}
+            disabled={isPublishing}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.customButtonText}>✎ 직접 제보하기</Text>
+          </TouchableOpacity>
         </>
       )}
 
@@ -215,6 +227,18 @@ const styles = StyleSheet.create({
   },
   reportButtonText: {
     fontSize: 16,
+    fontWeight: 'bold',
+    color: '#000000',
+  },
+  customButton: {
+    marginTop: 12,
+    borderWidth: 1,
+    borderColor: '#000000',
+    paddingVertical: 16,
+    alignItems: 'center',
+  },
+  customButtonText: {
+    fontSize: 15,
     fontWeight: 'bold',
     color: '#000000',
   },
