@@ -15,14 +15,7 @@ import {
 } from 'react-native';
 import { ShareCard, type ShareCardHandle } from 'components/ShareCard';
 import { ANCHOR_NAME, ANCHOR_TITLE, CHANNEL_NAME, type Article, type Category } from 'data/news';
-import anchorImage from '../../assets/anchor.png';
-import wakeImage from '../../assets/wake.png';
-import eatImage from '../../assets/eat.png';
-import nothingImage from '../../assets/nothing.png';
-import endureImage from '../../assets/endure.png';
-import washImage from '../../assets/wash.png';
-import outingImage from '../../assets/outing.png';
-import customImage from '../../assets/custom.png';
+import { ANCHOR_IMAGE, EXPERT_IMAGE } from 'data/characterImages';
 
 export const Route = createRoute('/article', {
   validateParams: (params) => params as Article,
@@ -41,18 +34,6 @@ const EXPERT_ICON: Record<Category, string> = {
 };
 
 const ANCHOR_ICON = '🕊️';
-
-const EXPERT_IMAGE: Record<Category, number> = {
-  WAKE: wakeImage,
-  EAT: eatImage,
-  NOTHING: nothingImage,
-  ENDURE: endureImage,
-  WASH: washImage,
-  OUTING: outingImage,
-  CUSTOM: customImage,
-};
-
-const ANCHOR_IMAGE = anchorImage;
 
 const AVATAR_SIZE = 56;
 

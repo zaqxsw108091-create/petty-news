@@ -1,12 +1,16 @@
 import React, { forwardRef } from 'react';
-import Svg, { Line, Rect, Text as SvgText, TSpan } from '@granite-js/native/react-native-svg';
+import Svg, { Image as SvgImage, Line, Rect, Text as SvgText, TSpan } from '@granite-js/native/react-native-svg';
 import { ANCHOR_NAME, ANCHOR_TITLE, CHANNEL_NAME, type Article } from 'data/news';
+import { ANCHOR_IMAGE, EXPERT_IMAGE } from 'data/characterImages';
 
 const CARD_WIDTH = 720;
 const PADDING = 40;
 const CONTENT_WIDTH = CARD_WIDTH - PADDING * 2;
 const RED = '#F04452';
 const BLACK = '#000000';
+const AVATAR_SIZE = 72;
+const AVATAR_GAP = 20;
+const COMMENT_TEXT_X = PADDING + AVATAR_SIZE + AVATAR_GAP;
 
 /** 폭에 맞춰 대략적인 글자 수 기준으로 줄바꿈한다. 공백이 없는 긴 구간(예: CUSTOM의 『...』)은 강제로 자른다 */
 function wrapText(text: string, fontSize: number, maxWidth: number = CONTENT_WIDTH): string[] {
@@ -118,19 +122,24 @@ export const ShareCard = forwardRef<ShareCardHandle, ShareCardProps>(function Sh
   cursorY += 40;
   elements.push(<Line key="div-headline" x1={PADDING} y1={cursorY} x2={CARD_WIDTH - PADDING} y2={cursorY} stroke={BLACK} strokeWidth={2} />);
 
-  function drawCommentRow(key: string, author: string, line: string) {
+  function drawCommentRow(key: string, author: string, line: string, avatarSource: number) {
+    const avatarY = cursorY + 12;
+    elements.push(
+      <SvgImage key={`${key}-avatar`} href={avatarSource} x={PADDING} y={avatarY} width={AVATAR_SIZE} height={AVATAR_SIZE} />
+    );
+
     cursorY += 48;
     elements.push(
-      <SvgText key={`${key}-author`} x={PADDING} y={cursorY} fontSize={22} fontWeight="bold" fill={BLACK}>
+      <SvgText key={`${key}-author`} x={COMMENT_TEXT_X} y={cursorY} fontSize={22} fontWeight="bold" fill={BLACK}>
         {author}
       </SvgText>
     );
     cursorY += 38;
-    const lines = wrapText(line, 24);
+    const lines = wrapText(line, 24, CONTENT_WIDTH - (AVATAR_SIZE + AVATAR_GAP));
     elements.push(
-      <SvgText key={`${key}-line`} x={PADDING} y={cursorY} fontSize={24} fill={BLACK}>
+      <SvgText key={`${key}-line`} x={COMMENT_TEXT_X} y={cursorY} fontSize={24} fill={BLACK}>
         {lines.map((l, i) => (
-          <TSpan key={i} x={PADDING} dy={i === 0 ? 0 : 32}>
+          <TSpan key={i} x={COMMENT_TEXT_X} dy={i === 0 ? 0 : 32}>
             {l}
           </TSpan>
         ))}
@@ -138,11 +147,13 @@ export const ShareCard = forwardRef<ShareCardHandle, ShareCardProps>(function Sh
     );
     cursorY += (lines.length - 1) * 32;
     cursorY += 36;
+    // 코멘트가 짧아 아바타보다 낮게 끝나면, 구분선이 아바타를 가로지르지 않도록 아래로 밀어준다
+    cursorY = Math.max(cursorY, avatarY + AVATAR_SIZE + 16);
     elements.push(<Line key={`${key}-div`} x1={PADDING} y1={cursorY} x2={CARD_WIDTH - PADDING} y2={cursorY} stroke={BLACK} strokeWidth={2} />);
   }
 
-  drawCommentRow('anchor', `${ANCHOR_TITLE} ${ANCHOR_NAME}`, article.anchor);
-  drawCommentRow('expert', `${article.expertOrg} ${article.expertName}`, article.expertLine);
+  drawCommentRow('anchor', `${ANCHOR_TITLE} ${ANCHOR_NAME}`, article.anchor, ANCHOR_IMAGE);
+  drawCommentRow('expert', `${article.expertOrg} ${article.expertName}`, article.expertLine, EXPERT_IMAGE[article.category]);
 
   cursorY += 30;
   const tickerHeight = 56;
