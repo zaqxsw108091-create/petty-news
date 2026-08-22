@@ -5,6 +5,7 @@ import {
   AccessibilityInfo,
   Animated,
   Easing,
+  Image,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -14,13 +15,21 @@ import {
 } from 'react-native';
 import { ShareCard, type ShareCardHandle } from 'components/ShareCard';
 import { ANCHOR_NAME, ANCHOR_TITLE, CHANNEL_NAME, type Article, type Category } from 'data/news';
+import anchorImage from '../../assets/anchor.png';
+import wakeImage from '../../assets/wake.png';
+import eatImage from '../../assets/eat.png';
+import nothingImage from '../../assets/nothing.png';
+import endureImage from '../../assets/endure.png';
+import washImage from '../../assets/wash.png';
+import outingImage from '../../assets/outing.png';
+import customImage from '../../assets/custom.png';
 
 export const Route = createRoute('/article', {
   validateParams: (params) => params as Article,
   component: Page,
 });
 
-/** 전문가 캐릭터 아이콘 (실제 선화 에셋이 준비되기 전 임시 표시) */
+/** 캐릭터 이미지 로딩 실패 시 대체로 쓰는 이모지 */
 const EXPERT_ICON: Record<Category, string> = {
   WAKE: '🐨',
   EAT: '🐹',
@@ -32,6 +41,43 @@ const EXPERT_ICON: Record<Category, string> = {
 };
 
 const ANCHOR_ICON = '🕊️';
+
+const EXPERT_IMAGE: Record<Category, number> = {
+  WAKE: wakeImage,
+  EAT: eatImage,
+  NOTHING: nothingImage,
+  ENDURE: endureImage,
+  WASH: washImage,
+  OUTING: outingImage,
+  CUSTOM: customImage,
+};
+
+const ANCHOR_IMAGE = anchorImage;
+
+const AVATAR_SIZE = 56;
+
+function CharacterAvatar({ source, fallbackEmoji }: { source: number; fallbackEmoji: string }) {
+  const [failed, setFailed] = useState(false);
+
+  if (failed) {
+    return (
+      <View style={styles.avatarBox}>
+        <Text style={styles.avatarFallbackText}>{fallbackEmoji}</Text>
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles.avatarBox}>
+      <Image
+        source={source}
+        style={styles.avatarImage}
+        resizeMode="contain"
+        onError={() => setFailed(true)}
+      />
+    </View>
+  );
+}
 
 function formatTime(date: Date): string {
   const hours = String(date.getHours()).padStart(2, '0');
@@ -198,16 +244,22 @@ function Page() {
         </View>
 
         <View style={styles.commentRow}>
-          <Text style={styles.commentAuthor}>
-            {ANCHOR_ICON} {ANCHOR_TITLE} {ANCHOR_NAME}
-          </Text>
+          <View style={styles.commentAuthorRow}>
+            <CharacterAvatar source={ANCHOR_IMAGE} fallbackEmoji={ANCHOR_ICON} />
+            <Text style={styles.commentAuthor}>
+              {ANCHOR_TITLE} {ANCHOR_NAME}
+            </Text>
+          </View>
           <Text style={styles.commentLine}>{article.anchor}</Text>
         </View>
 
         <View style={styles.commentRow}>
-          <Text style={styles.commentAuthor}>
-            {expertIcon} {article.expertOrg} {article.expertName}
-          </Text>
+          <View style={styles.commentAuthorRow}>
+            <CharacterAvatar source={EXPERT_IMAGE[article.category]} fallbackEmoji={expertIcon} />
+            <Text style={styles.commentAuthor}>
+              {article.expertOrg} {article.expertName}
+            </Text>
+          </View>
           <Text style={styles.commentLine}>{article.expertLine}</Text>
         </View>
       </ScrollView>
@@ -327,11 +379,29 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#000000',
   },
+  commentAuthorRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 6,
+  },
   commentAuthor: {
     fontWeight: 'bold',
     fontSize: 14,
     color: '#000000',
-    marginBottom: 6,
+  },
+  avatarBox: {
+    width: AVATAR_SIZE,
+    height: AVATAR_SIZE,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  avatarImage: {
+    width: AVATAR_SIZE,
+    height: AVATAR_SIZE,
+  },
+  avatarFallbackText: {
+    fontSize: 32,
   },
   commentLine: {
     fontSize: 15,
