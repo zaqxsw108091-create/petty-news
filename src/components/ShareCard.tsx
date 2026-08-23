@@ -1,7 +1,7 @@
 import React, { forwardRef } from 'react';
 import Svg, { Image as SvgImage, Line, Rect, Text as SvgText, TSpan } from '@granite-js/native/react-native-svg';
 import { ANCHOR_NAME, ANCHOR_TITLE, CHANNEL_NAME, type Article } from 'data/news';
-import { ANCHOR_IMAGE, EXPERT_IMAGE } from 'data/characterImages';
+import { ANCHOR_IMAGE, EXPERT_IMAGE, type ImageSource } from 'data/characterImages';
 
 const CARD_WIDTH = 720;
 const PADDING = 40;
@@ -122,7 +122,7 @@ export const ShareCard = forwardRef<ShareCardHandle, ShareCardProps>(function Sh
   cursorY += 40;
   elements.push(<Line key="div-headline" x1={PADDING} y1={cursorY} x2={CARD_WIDTH - PADDING} y2={cursorY} stroke={BLACK} strokeWidth={2} />);
 
-  function drawCommentRow(key: string, author: string, line: string, avatarSource: number) {
+  function drawCommentRow(key: string, author: string, line: string, avatarSource: ImageSource) {
     const avatarY = cursorY + 12;
     elements.push(
       <SvgImage key={`${key}-avatar`} href={avatarSource} x={PADDING} y={avatarY} width={AVATAR_SIZE} height={AVATAR_SIZE} />

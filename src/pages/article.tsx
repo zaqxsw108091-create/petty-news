@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 import { ShareCard, type ShareCardHandle } from 'components/ShareCard';
 import { ANCHOR_NAME, ANCHOR_TITLE, CHANNEL_NAME, type Article, type Category } from 'data/news';
-import { ANCHOR_IMAGE, EXPERT_IMAGE } from 'data/characterImages';
+import { ANCHOR_IMAGE, EXPERT_IMAGE, type ImageSource } from 'data/characterImages';
 
 export const Route = createRoute('/article', {
   validateParams: (params) => params as Article,
@@ -37,7 +37,7 @@ const ANCHOR_ICON = '🕊️';
 
 const AVATAR_SIZE = 56;
 
-function CharacterAvatar({ source, fallbackEmoji }: { source: number; fallbackEmoji: string }) {
+function CharacterAvatar({ source, fallbackEmoji }: { source: ImageSource; fallbackEmoji: string }) {
   const [failed, setFailed] = useState(false);
 
   if (failed) {

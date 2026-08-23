@@ -3,7 +3,7 @@ import { hermes } from '@granite-js/plugin-hermes';
 import { defineConfig } from '@granite-js/react-native/config';
 
 export default defineConfig({
-  appName: 'petty-news',
+  appName: 'pettynews',
   scheme: 'granite',
   plugins: [router(), hermes()],
 });
