@@ -17,3 +17,6 @@ yarn-error.log
 .DS_Store
 
 .claude/
+
+# 원본 PNG. base64로 인라인 처리해 src/data/characterImages.ts에 이미 포함됨
+/assets/
