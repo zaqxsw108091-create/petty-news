@@ -9,7 +9,9 @@ import {
   CHANNEL_NAME,
   CHANNEL_SLOGAN,
   CLOSING,
+  DAILY_PUBLISH_LIMIT,
   PRIVACY_NOTE,
+  countPublishedOn,
   createArticle,
   createFollowup,
   today,
@@ -65,7 +67,12 @@ function Page() {
     }, [])
   );
 
+  // archive는 항상 최신이 앞에 오도록 저장되므로(publishToArchive), 오늘 날짜 중
+  // 첫 매치가 곧 오늘 가장 최근에 발행한 기사다.
   const todayArticle = archive.find((a) => a.date === todayStr);
+  const todayCount = countPublishedOn(archive, todayStr);
+  const remainingCount = DAILY_PUBLISH_LIMIT - todayCount;
+  const isLimitReached = remainingCount <= 0;
 
   // SPEC 6.4: 어제 기록이 여러 건이면 가장 최근 것 기준. archive는 항상 최신이 앞에 오도록
   // 저장되므로(publishToArchive), 어제 날짜 중 첫 매치가 곧 가장 최근 기록이다.
@@ -78,8 +85,7 @@ function Page() {
   const handleReport = async (category: ReportCategory) => {
     // ref로 동기 잠금을 걸어야 한다: state는 배치되어 연타 시 두 번째 탭도 통과할 수 있다
     if (isPublishingRef.current) return;
-    const publishDate = today();
-    if (archive.some((a) => a.date === publishDate)) return;
+    if (countPublishedOn(archive, today()) >= DAILY_PUBLISH_LIMIT) return;
 
     isPublishingRef.current = true;
     setIsPublishing(true);
@@ -119,7 +125,7 @@ function Page() {
         </View>
       )}
 
-      {todayArticle ? (
+      {isLimitReached ? (
         <View style={styles.closing}>
           <Text style={styles.closingLine}>{CLOSING.line1}</Text>
           <Text style={styles.closingLine}>{CLOSING.line2}</Text>
@@ -130,6 +136,7 @@ function Page() {
       ) : (
         <>
           <Text style={styles.prompt}>오늘의 제보를 기다립니다</Text>
+          <Text style={styles.remainingNotice}>오늘 {remainingCount}번 더 제보할 수 있습니다</Text>
           <View style={styles.grid}>
             {CATEGORY_ROWS.map((row, rowIndex) => (
               <View style={styles.row} key={rowIndex}>
@@ -208,6 +215,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: '#000000',
+    marginBottom: 4,
+  },
+  remainingNotice: {
+    fontSize: 13,
+    color: '#666666',
     marginBottom: 16,
   },
   grid: {

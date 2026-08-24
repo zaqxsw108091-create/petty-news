@@ -68,6 +68,9 @@ export const CLOSING = {
   line2: '내일도 하찮은 하루 되시길 바랍니다.',
 };
 
+/** 하루 최대 발행 횟수. CUSTOM(직접 제보) 포함 전체 발행이 이 횟수에 함께 집계된다 */
+export const DAILY_PUBLISH_LIMIT = 3;
+
 export const EMPTY_ARCHIVE = '아직 보도된 소식이 없습니다. 오늘의 제보를 기다립니다.';
 export const PRIVACY_NOTE = '이 앱은 어떤 개인정보도 수집하지 않습니다';
 
@@ -437,6 +440,11 @@ export function yesterday(): string {
   d.setDate(d.getDate() - 1);
   const p = (n: number) => String(n).padStart(2, '0');
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+}
+
+/** 별도 플래그 없이, 보관함에서 특정 날짜의 발행 건수를 직접 센다 */
+export function countPublishedOn(articles: Article[], date: string): number {
+  return articles.filter((a) => a.date === date).length;
 }
 
 /**
