@@ -49,3 +49,12 @@ export async function publishToArchive(articles: Article[], article: Article): P
   await saveArchive(next);
   return next;
 }
+
+/** 테스트용: 로컬 보관함 전체 초기화 */
+export async function clearArchive(): Promise<void> {
+  try {
+    await Storage.removeItem(ARCHIVE_KEY);
+  } catch {
+    // 삭제 실패해도 무시
+  }
+}
