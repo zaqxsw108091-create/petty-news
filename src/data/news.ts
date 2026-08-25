@@ -374,6 +374,17 @@ export const NATION_SUMMARY_LABEL: Record<Category, string> = {
   OUTING: '나갔다왔습니다',
 };
 
+/** 오늘의 집계 목록에서 카테고리별 한 줄에 쓰는 짧은 라벨. NATION_SUMMARY_LABEL을 나열용으로 다듬은 것 */
+export const SUMMARY_LIST_LABEL: Record<Category, string> = {
+  WAKE: '일어남',
+  EAT: '밥 먹음',
+  NOTHING: '아무것도 안 함',
+  ENDURE: '참음',
+  WASH: '씻음',
+  CUSTOM: '무언가를 해냄',
+  OUTING: '나갔다옴',
+};
+
 /** 직접 제보(CUSTOM) 헤드라인 틀. {text} 자리에 입력을 넣는다 */
 export const CUSTOM_HEADLINE_TEMPLATES: string[] = [
   '한 시민, 오늘 『{text}』에 성공',
