@@ -8,10 +8,15 @@
 import { SUPABASE_ANON_KEY, SUPABASE_FETCH_TIMEOUT_MS, SUPABASE_URL } from 'config/supabase';
 import { CATEGORIES, type Category } from './news';
 
-export type ReportCategory = Exclude<Category, 'CUSTOM'>;
+/**
+ * 서버가 받는 카테고리 타입. DB의 insert 정책(with_check)이 CUSTOM까지 7개를
+ * 허용하도록 갱신되어, 홈 버튼 6개(Exclude<Category, 'CUSTOM'>)와 달리 CUSTOM도 포함한다.
+ * 단, CUSTOM이어도 카테고리 코드만 보내며 사용자가 입력한 텍스트는 절대 보내지 않는다.
+ */
+export type ReportCategory = Category;
 
-/** 서버로 보내거나 서버에서 받아도 되는 카테고리 화이트리스트. CUSTOM은 절대 포함하지 않는다 */
-const CATEGORY_WHITELIST: readonly ReportCategory[] = CATEGORIES;
+/** 서버로 보내거나 서버에서 받아도 되는 카테고리 화이트리스트 */
+const CATEGORY_WHITELIST: readonly ReportCategory[] = [...CATEGORIES, 'CUSTOM'];
 
 function isReportCategory(value: unknown): value is ReportCategory {
   return typeof value === 'string' && (CATEGORY_WHITELIST as readonly string[]).includes(value);
@@ -34,7 +39,8 @@ async function fetchWithTimeout(url: string, init: RequestInit): Promise<Respons
 
 /**
  * 제보 카테고리를 서버에 기록한다. 카테고리 코드 외에는 아무것도 보내지 않는다
- * (시각은 DB의 created_at 기본값으로 기록됨). 실패해도 호출부는 신경 쓰지 않는다.
+ * (시각은 DB의 created_at 기본값으로 기록됨). CUSTOM(직접 제보)도 코드만 보내며,
+ * 사용자가 입력한 텍스트는 호출부에서부터 이 함수에 전달되지 않는다. 실패해도 호출부는 신경 쓰지 않는다.
  */
 export async function submitReport(category: ReportCategory): Promise<void> {
   if (!isReportCategory(category)) return;

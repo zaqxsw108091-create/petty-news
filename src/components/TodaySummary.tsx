@@ -1,4 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useFocusEffect } from '@granite-js/native/@react-navigation/native';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Animated, StyleSheet, Text } from 'react-native';
 import { fetchTodayCounts, MAX_DISPLAYABLE_COUNT, type CategoryCount } from 'data/reports';
 import { NATION_SUMMARY_LABEL } from 'data/news';
@@ -19,22 +20,27 @@ export function TodaySummary() {
   const [displayN, setDisplayN] = useState(0);
   const anim = useRef(new Animated.Value(0)).current;
 
-  useEffect(() => {
-    let cancelled = false;
-    fetchTodayCounts().then((counts) => {
-      if (cancelled || !counts) return;
-      const best = counts.reduce((a, b) => (b.n > a.n ? b : a));
-      if (best.n > MAX_DISPLAYABLE_COUNT) return;
-      setTop(best);
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  // 홈 화면이 포커스될 때마다(최초 진입 포함) 재조회한다. 실패하면 이전에 표시 중이던
+  // top을 그대로 두고 조용히 넘어가 — 빈 화면이나 깜빡임이 생기지 않는다.
+  useFocusEffect(
+    useCallback(() => {
+      let cancelled = false;
+      fetchTodayCounts().then((counts) => {
+        if (cancelled || !counts) return;
+        const best = counts.reduce((a, b) => (b.n > a.n ? b : a));
+        if (best.n > MAX_DISPLAYABLE_COUNT) return;
+        setTop(best);
+      });
+      return () => {
+        cancelled = true;
+      };
+    }, [])
+  );
 
   useEffect(() => {
     if (!top) return;
-    anim.setValue(0);
+    // 최초 표시가 아니라면(재포커스로 값이 갱신된 경우) 0으로 되돌리지 않고 현재
+    // 값에서 새 값으로 이어서 움직인다 — 그래야 리셋되는 깜빡임 없이 자연스럽다.
     const id = anim.addListener(({ value }) => setDisplayN(value));
     Animated.timing(anim, {
       toValue: top.n,

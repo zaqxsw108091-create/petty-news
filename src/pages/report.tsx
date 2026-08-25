@@ -3,6 +3,7 @@ import { useFocusEffect } from '@granite-js/native/@react-navigation/native';
 import React, { useCallback, useRef, useState } from 'react';
 import { SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { loadArchive, publishToArchive } from 'data/archive';
+import { submitReport } from 'data/reports';
 import {
   CHANNEL_NAME,
   CLOSING,
@@ -62,6 +63,9 @@ function Page() {
 
     isPublishingRef.current = true;
     setIsPublishing(true);
+    // 서버에는 카테고리 코드 'CUSTOM'만 보낸다. 사용자가 입력한 trimmed 텍스트는
+    // 절대 넘기지 않는다 — 로컬 속보 표시와 무관하게 조용히 실패해도 되므로 await하지 않는다
+    void submitReport('CUSTOM');
     try {
       const { article } = createArticle('CUSTOM', lastPicks, trimmed);
       const nextArchive = await publishToArchive(archive, article);

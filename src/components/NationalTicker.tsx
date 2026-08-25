@@ -1,4 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useFocusEffect } from '@granite-js/native/@react-navigation/native';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { AccessibilityInfo, Animated, Easing, StyleSheet, View } from 'react-native';
 import { fetchRecentCategories } from 'data/reports';
 import { NATION_TICKER_LABEL } from 'data/news';
@@ -17,16 +18,20 @@ export function NationalTicker() {
   const [containerWidth, setContainerWidth] = useState(0);
   const [contentWidth, setContentWidth] = useState(0);
 
-  useEffect(() => {
-    let cancelled = false;
-    fetchRecentCategories().then((categories) => {
-      if (cancelled || !categories) return;
-      setText(categories.map((c) => NATION_TICKER_LABEL[c]).join(SEPARATOR));
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  // 홈 화면이 포커스될 때마다(최초 진입 포함) 재조회한다. 실패하면 이전에 표시 중이던
+  // text를 그대로 두고 조용히 넘어가 — 빈 화면이나 깜빡임이 생기지 않는다.
+  useFocusEffect(
+    useCallback(() => {
+      let cancelled = false;
+      fetchRecentCategories().then((categories) => {
+        if (cancelled || !categories) return;
+        setText(categories.map((c) => NATION_TICKER_LABEL[c]).join(SEPARATOR));
+      });
+      return () => {
+        cancelled = true;
+      };
+    }, [])
+  );
 
   useEffect(() => {
     let mounted = true;

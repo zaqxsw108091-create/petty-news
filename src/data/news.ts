@@ -353,22 +353,24 @@ export const TICKER_LINES: string[] = [
  * 전국 티커(홈 화면 상단)용 문장. 서버는 카테고리 코드만 보내고, 화면에 보일 문장은
  * 반드시 이 로컬 매핑을 거친다 — 서버 응답 문자열을 그대로 렌더링하지 않는다.
  */
-export const NATION_TICKER_LABEL: Record<Exclude<Category, 'CUSTOM'>, string> = {
+export const NATION_TICKER_LABEL: Record<Category, string> = {
   WAKE: '어딘가에서 한 시민이 방금 일어났습니다',
   EAT: '어딘가에서 한 시민이 방금 밥을 먹었습니다',
   NOTHING: '어딘가에서 한 시민이 방금 아무것도 하지 않았습니다',
   ENDURE: '어딘가에서 한 시민이 방금 참아냈습니다',
   WASH: '어딘가에서 한 시민이 방금 씻었습니다',
   OUTING: '어딘가에서 한 시민이 방금 다녀왔습니다',
+  CUSTOM: '어딘가에서 한 시민이 방금 무언가를 해냈습니다',
 };
 
 /** 오늘의 집계 문구("오늘 전국에서 N명이 …")에서 N 뒤에 붙는 서술어. 역시 로컬 매핑만 사용한다 */
-export const NATION_SUMMARY_LABEL: Record<Exclude<Category, 'CUSTOM'>, string> = {
+export const NATION_SUMMARY_LABEL: Record<Category, string> = {
   WAKE: '일어났습니다',
   EAT: '밥을 먹었습니다',
   NOTHING: '아무것도 하지 않았습니다',
   ENDURE: '참았습니다',
   WASH: '씻었습니다',
+  CUSTOM: '무언가를 해냈습니다',
   OUTING: '나갔다왔습니다',
 };
 
