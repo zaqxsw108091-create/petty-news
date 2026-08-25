@@ -2,7 +2,7 @@ import { createRoute } from '@granite-js/react-native';
 import { useFocusEffect } from '@granite-js/native/@react-navigation/native';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { loadArchive, publishToArchive, clearArchive } from 'data/archive';
+import { loadArchive, publishToArchive } from 'data/archive';
 import { submitReport } from 'data/reports';
 import { NationalTicker } from 'components/NationalTicker';
 import { TodaySummary } from 'components/TodaySummary';
@@ -118,11 +118,6 @@ function Page() {
     navigation.navigate('/report', { lastPicks });
   };
 
-  const handleClearData = async () => {
-    await clearArchive();
-    setArchive([]);
-  };
-
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <Text style={styles.channelName}>{CHANNEL_NAME}</Text>
@@ -180,10 +175,6 @@ function Page() {
 
       <TouchableOpacity style={styles.archiveLink} onPress={handleOpenArchive} activeOpacity={0.7}>
         <Text style={styles.archiveLinkText}>지난 속보 보관함</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.clearDataButton} onPress={handleClearData} activeOpacity={0.7}>
-        <Text style={styles.clearDataButtonText}>[테스트] 데이터 초기화</Text>
       </TouchableOpacity>
 
       <Text style={styles.privacyNote}>{PRIVACY_NOTE}</Text>
@@ -302,15 +293,6 @@ const styles = StyleSheet.create({
   archiveLinkText: {
     fontSize: 14,
     color: '#333333',
-    textDecorationLine: 'underline',
-  },
-  clearDataButton: {
-    marginTop: 12,
-    alignItems: 'center',
-  },
-  clearDataButtonText: {
-    fontSize: 12,
-    color: '#999999',
     textDecorationLine: 'underline',
   },
   privacyNote: {
