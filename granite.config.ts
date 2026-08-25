@@ -15,7 +15,7 @@ export default defineConfig({
       // react-native 버전(0.84.0)을 명시해 그 호환 레이어 자체를 건너뛴다.
       target: '0.84.0',
       brand: {
-        displayName: '보도블록',
+        displayName: '하찮은 속보',
         primaryColor: '#F04452',
         icon: 'https://static.toss.im/appsintoss/79633/c70216da-85d8-435e-95ab-616d71f33108.png',
       },
