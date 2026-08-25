@@ -349,6 +349,29 @@ export const TICKER_LINES: string[] = [
   '하찮은 소식만 전해드립니다',
 ];
 
+/**
+ * 전국 티커(홈 화면 상단)용 문장. 서버는 카테고리 코드만 보내고, 화면에 보일 문장은
+ * 반드시 이 로컬 매핑을 거친다 — 서버 응답 문자열을 그대로 렌더링하지 않는다.
+ */
+export const NATION_TICKER_LABEL: Record<Exclude<Category, 'CUSTOM'>, string> = {
+  WAKE: '어딘가에서 한 시민이 방금 일어났습니다',
+  EAT: '어딘가에서 한 시민이 방금 밥을 먹었습니다',
+  NOTHING: '어딘가에서 한 시민이 방금 아무것도 하지 않았습니다',
+  ENDURE: '어딘가에서 한 시민이 방금 참아냈습니다',
+  WASH: '어딘가에서 한 시민이 방금 씻었습니다',
+  OUTING: '어딘가에서 한 시민이 방금 다녀왔습니다',
+};
+
+/** 오늘의 집계 문구("오늘 전국에서 N명이 …")에서 N 뒤에 붙는 서술어. 역시 로컬 매핑만 사용한다 */
+export const NATION_SUMMARY_LABEL: Record<Exclude<Category, 'CUSTOM'>, string> = {
+  WAKE: '일어났습니다',
+  EAT: '밥을 먹었습니다',
+  NOTHING: '아무것도 하지 않았습니다',
+  ENDURE: '참았습니다',
+  WASH: '씻었습니다',
+  OUTING: '나갔다왔습니다',
+};
+
 /** 직접 제보(CUSTOM) 헤드라인 틀. {text} 자리에 입력을 넣는다 */
 export const CUSTOM_HEADLINE_TEMPLATES: string[] = [
   '한 시민, 오늘 『{text}』에 성공',

@@ -3,6 +3,9 @@ import { useFocusEffect } from '@granite-js/native/@react-navigation/native';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { loadArchive, publishToArchive, clearArchive } from 'data/archive';
+import { submitReport } from 'data/reports';
+import { NationalTicker } from 'components/NationalTicker';
+import { TodaySummary } from 'components/TodaySummary';
 import {
   CATEGORIES,
   CATEGORY_LABEL,
@@ -89,6 +92,8 @@ function Page() {
 
     isPublishingRef.current = true;
     setIsPublishing(true);
+    // 서버 전송은 로컬 속보 표시와 무관하게 조용히 실패해야 하므로 await하지 않는다
+    void submitReport(category);
     try {
       const { article, picks } = createArticle(category, lastPicks);
       const nextArchive = await publishToArchive(archive, article);
@@ -122,6 +127,9 @@ function Page() {
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <Text style={styles.channelName}>{CHANNEL_NAME}</Text>
       <Text style={styles.channelSlogan}>{CHANNEL_SLOGAN}</Text>
+
+      <NationalTicker />
+      <TodaySummary />
 
       {followupText && (
         <View style={styles.followup}>
