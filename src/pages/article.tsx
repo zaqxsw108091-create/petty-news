@@ -1,4 +1,5 @@
 import { createRoute } from '@granite-js/react-native';
+import { CommonActions } from '@granite-js/native/@react-navigation/native';
 import { saveBase64Data, share } from '@apps-in-toss/native-modules';
 import React, { useEffect, useRef, useState } from 'react';
 import {
@@ -114,6 +115,15 @@ function Page() {
 
   const handleOpenArchive = () => {
     navigation.navigate('/archive');
+  };
+
+  const handleGoHome = () => {
+    navigation.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [{ name: '/' }],
+      })
+    );
   };
 
   useEffect(() => {
@@ -279,6 +289,12 @@ function Page() {
         </TouchableOpacity>
       </View>
 
+      <View style={styles.homeLinkRow}>
+        <TouchableOpacity onPress={handleGoHome} activeOpacity={0.7}>
+          <Text style={styles.homeLinkText}>보도국으로</Text>
+        </TouchableOpacity>
+      </View>
+
       {/* 화면 캡처 API가 없어 react-native-svg의 Svg.toDataURL()로 별도 카드 이미지를 만든다.
           화면 밖에 그려두고 저장 시점에만 참조한다 */}
       <View style={styles.hiddenCapture} pointerEvents="none">
@@ -434,6 +450,15 @@ const styles = StyleSheet.create({
     opacity: 0.35,
   },
   actionButtonText: {
+    fontWeight: 'bold',
+    color: '#000000',
+  },
+  homeLinkRow: {
+    alignItems: 'center',
+    paddingBottom: 20,
+  },
+  homeLinkText: {
+    fontSize: 13,
     fontWeight: 'bold',
     color: '#000000',
   },

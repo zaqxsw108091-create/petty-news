@@ -1,5 +1,5 @@
 import { createRoute } from '@granite-js/react-native';
-import { useFocusEffect } from '@granite-js/native/@react-navigation/native';
+import { CommonActions, useFocusEffect } from '@granite-js/native/@react-navigation/native';
 import React, { useCallback, useState } from 'react';
 import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { loadArchive } from 'data/archive';
@@ -32,39 +32,68 @@ function Page() {
     }, [])
   );
 
-  if (articles.length === 0) {
-    return (
-      <View style={styles.emptyContainer}>
-        <Text style={styles.emptyText}>{EMPTY_ARCHIVE}</Text>
-      </View>
+  const handleGoHome = () => {
+    navigation.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [{ name: '/' }],
+      })
     );
-  }
+  };
 
   return (
-    <FlatList
-      style={styles.container}
-      contentContainerStyle={styles.listContent}
-      data={articles}
-      keyExtractor={(item) => item.id}
-      ItemSeparatorComponent={() => <View style={styles.separator} />}
-      renderItem={({ item }) => (
-        <TouchableOpacity
-          style={styles.row}
-          activeOpacity={0.7}
-          onPress={() => navigation.navigate('/article', item)}
-        >
-          <Text style={styles.date}>{item.date}</Text>
-          <Text style={styles.headline} numberOfLines={2}>
-            {item.headline}
-          </Text>
-          <Text style={styles.category}>{categoryLabel(item)}</Text>
-        </TouchableOpacity>
+    <View style={styles.screen}>
+      <TouchableOpacity style={styles.homeLinkRow} onPress={handleGoHome} activeOpacity={0.7}>
+        <Text style={styles.homeLinkText}>보도국으로</Text>
+      </TouchableOpacity>
+
+      {articles.length === 0 ? (
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyText}>{EMPTY_ARCHIVE}</Text>
+        </View>
+      ) : (
+        <FlatList
+          style={styles.container}
+          contentContainerStyle={styles.listContent}
+          data={articles}
+          keyExtractor={(item) => item.id}
+          ItemSeparatorComponent={() => <View style={styles.separator} />}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              style={styles.row}
+              activeOpacity={0.7}
+              onPress={() => navigation.navigate('/article', item)}
+            >
+              <Text style={styles.date}>{item.date}</Text>
+              <Text style={styles.headline} numberOfLines={2}>
+                {item.headline}
+              </Text>
+              <Text style={styles.category}>{categoryLabel(item)}</Text>
+            </TouchableOpacity>
+          )}
+        />
       )}
-    />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
+  homeLinkRow: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#000000',
+  },
+  homeLinkText: {
+    fontSize: 13,
+    fontWeight: 'bold',
+    color: '#000000',
+  },
   container: {
     flex: 1,
     backgroundColor: '#FFFFFF',
