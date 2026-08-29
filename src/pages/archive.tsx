@@ -43,9 +43,14 @@ function Page() {
 
   return (
     <View style={styles.screen}>
-      <TouchableOpacity style={styles.homeLinkRow} onPress={handleGoHome} activeOpacity={0.7}>
-        <Text style={styles.homeLinkText}>보도국으로</Text>
-      </TouchableOpacity>
+      <View style={styles.homeLinkRow}>
+        <TouchableOpacity onPress={handleGoHome} activeOpacity={0.7}>
+          <Text style={styles.homeLinkText}>보도국으로</Text>
+        </TouchableOpacity>
+        {articles.length > 0 && (
+          <Text style={styles.countText}>지금까지 {articles.length}건 보도</Text>
+        )}
+      </View>
 
       {articles.length === 0 ? (
         <View style={styles.emptyContainer}>
@@ -92,6 +97,11 @@ const styles = StyleSheet.create({
   homeLinkText: {
     fontSize: 13,
     fontWeight: 'bold',
+    color: '#000000',
+  },
+  countText: {
+    marginTop: 8,
+    fontSize: 13,
     color: '#000000',
   },
   container: {

@@ -85,6 +85,10 @@ function Page() {
     [yesterdayArticle?.id]
   );
 
+  // archive는 항상 최신이 앞에 오도록 저장되므로, 첫 항목이 곧 가장 최근 발행 속보다.
+  const latestArticle = archive[0];
+  const latestLabel = latestArticle?.date === todayStr ? '오늘의 속보' : '어제의 속보';
+
   const handleReport = async (category: ReportCategory) => {
     // ref로 동기 잠금을 걸어야 한다: state는 배치되어 연타 시 두 번째 탭도 통과할 수 있다
     if (isPublishingRef.current) return;
@@ -118,6 +122,10 @@ function Page() {
     navigation.navigate('/report', { lastPicks });
   };
 
+  const handleOpenLatest = () => {
+    if (latestArticle) navigation.navigate('/article', latestArticle);
+  };
+
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <Text style={styles.channelName}>{CHANNEL_NAME}</Text>
@@ -131,6 +139,14 @@ function Page() {
           <Text style={styles.followupLabel}>어제의 후속 보도</Text>
           <Text style={styles.followupText}>{followupText}</Text>
         </View>
+      )}
+
+      {latestArticle && (
+        <TouchableOpacity style={styles.latestRow} onPress={handleOpenLatest} activeOpacity={0.7}>
+          <Text style={styles.latestText} numberOfLines={1}>
+            {`${latestLabel} · "${latestArticle.headline}"`}
+          </Text>
+        </TouchableOpacity>
       )}
 
       {isLimitReached ? (
@@ -218,6 +234,16 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#000000',
     lineHeight: 20,
+  },
+  latestRow: {
+    borderTopWidth: 1,
+    borderColor: '#000000',
+    paddingVertical: 14,
+    marginBottom: 24,
+  },
+  latestText: {
+    fontSize: 14,
+    color: '#000000',
   },
   prompt: {
     fontSize: 16,

@@ -171,7 +171,13 @@ export const ShareCard = forwardRef<ShareCardHandle, ShareCardProps>(function Sh
       보도블록 · 하찮은 속보
     </SvgText>
   );
-  cursorY += 40;
+  cursorY += 28;
+  elements.push(
+    <SvgText key="cta" x={CARD_WIDTH / 2} y={cursorY} fontSize={14} fill="#999999" textAnchor="middle">
+      {`토스 앱에서 '하찮은 속보' 검색`}
+    </SvgText>
+  );
+  cursorY += 34;
 
   const cardHeight = cursorY;
 
