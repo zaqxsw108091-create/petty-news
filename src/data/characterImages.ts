@@ -742,4 +742,5 @@ export const EXPERT_IMAGE: Record<Category, ImageSource> = {
   WASH: { uri: PREFIX + WASH_B64 },
   OUTING: { uri: PREFIX + OUTING_B64 },
   CUSTOM: { uri: PREFIX + CUSTOM_B64 },
+  WEEKDAY: { uri: PREFIX + CUSTOM_B64 },
 };

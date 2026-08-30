@@ -32,6 +32,7 @@ const EXPERT_ICON: Record<Category, string> = {
   WASH: '🐱',
   OUTING: '🐚',
   CUSTOM: '🐭',
+  WEEKDAY: '🐭',
 };
 
 const ANCHOR_ICON = '🕊️';

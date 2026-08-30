@@ -18,7 +18,8 @@ export type Category =
   | 'ENDURE'
   | 'WASH'
   | 'OUTING'
-  | 'CUSTOM';
+  | 'CUSTOM'
+  | 'WEEKDAY';
 
 export const CATEGORIES: Exclude<Category, 'CUSTOM'>[] = [
   'WAKE',
@@ -36,6 +37,7 @@ export const CATEGORY_LABEL: Record<Exclude<Category, 'CUSTOM'>, string> = {
   ENDURE: '참았음',
   WASH: '씻었음',
   OUTING: '나갔다옴',
+  WEEKDAY: '요일 확인',
 };
 
 export interface Expert {
@@ -76,7 +78,7 @@ export const PRIVACY_NOTE = '이 앱은 어떤 개인정보도 수집하지 않�
 
 /* ────────────────────────────────────────── */
 
-export const BANK: Record<Exclude<Category, 'CUSTOM'>, CategoryBank> = {
+export const BANK: Record<Exclude<Category, 'CUSTOM' | 'WEEKDAY'>, CategoryBank> = {
   WAKE: {
     headline: [
       '한 시민, 오늘 아침 기어이 일어나',
@@ -361,6 +363,7 @@ export const NATION_TICKER_LABEL: Record<Category, string> = {
   WASH: '어딘가에서 한 시민이 방금 씻었습니다',
   OUTING: '어딘가에서 한 시민이 방금 다녀왔습니다',
   CUSTOM: '어딘가에서 한 시민이 방금 무언가를 해냈습니다',
+  WEEKDAY: '어딘가에서 한 시민이 오늘 요일을 확인했습니다',
 };
 
 /** 오늘의 집계 문구("오늘 전국에서 N명이 …")에서 N 뒤에 붙는 서술어. 역시 로컬 매핑만 사용한다 */
@@ -372,6 +375,7 @@ export const NATION_SUMMARY_LABEL: Record<Category, string> = {
   WASH: '씻었습니다',
   CUSTOM: '무언가를 해냈습니다',
   OUTING: '나갔다왔습니다',
+  WEEKDAY: '오늘 요일을 확인했습니다',
 };
 
 /** 오늘의 집계 목록에서 카테고리별 한 줄에 쓰는 짧은 라벨. NATION_SUMMARY_LABEL을 나열용으로 다듬은 것 */
@@ -383,6 +387,7 @@ export const SUMMARY_LIST_LABEL: Record<Category, string> = {
   WASH: '씻음',
   CUSTOM: '무언가를 해냄',
   OUTING: '나갔다옴',
+  WEEKDAY: '요일 확인',
 };
 
 /** 직접 제보(CUSTOM) 헤드라인 틀. {text} 자리에 입력을 넣는다 */
@@ -429,6 +434,77 @@ export const FOLLOWUP_LINES: string[] = [
   '후속 취재 결과 특별한 변화는 없었습니다',
   '어제의 소식은 여전히 유효합니다',
 ];
+
+/* ────────────────────────────────────────── */
+/* 요일별 특별 보도 (WEEKDAY) — 소재가 요일 자체이므로 다른 카테고리와 겹치지 않는다 */
+
+export type Weekday = '월' | '화' | '수' | '목' | '금' | '토' | '일';
+
+/** Date#getDay()의 반환값(0=일요일)과 순서를 맞춘 테이블 */
+const WEEKDAY_ORDER: Weekday[] = ['일', '월', '화', '수', '목', '금', '토'];
+
+/** 로컬 시간 기준 오늘 요일. today()/yesterday()와 같은 로컬 자정 기준을 쓴다 */
+export function currentWeekday(): Weekday {
+  return WEEKDAY_ORDER[new Date().getDay()]!;
+}
+
+export interface WeekdayEntry {
+  headline: string[];
+  /** 제갈하찮의 요일 전용 멘트. 하루에 하나뿐이라 풀이 아니라 단일 문장이다 */
+  line: string;
+}
+
+export const WEEKDAY_BANK: Record<Weekday, WeekdayEntry> = {
+  월: {
+    headline: ['한 시민, 월요일을 통과해', '월요일 경과 확인… 남은 요일 넷'],
+    line: '"월요일은 매주 돌아옵니다. 매번 처음처럼 어렵습니다."',
+  },
+  화: {
+    headline: ['한 시민, 아직 화요일임을 확인', '요일 확인 결과 화요일… 본인도 놀라'],
+    line: '"화요일은 길게 느껴지도록 되어 있습니다."',
+  },
+  수: {
+    headline: ['한 시민, 한 주의 절반 지점 통과', '절반 경과… 나머지 절반 그대로 남아'],
+    line: '"절반은 절반입니다. 더도 덜도 아닙니다."',
+  },
+  목: {
+    headline: ['한 시민, 목요일까지 도달', '목요일 확인… 특이사항 없음'],
+    line: '"여기까지 오신 것이 이미 대부분입니다."',
+  },
+  금: {
+    headline: ['한 시민, 마침내 금요일에 도착', '금요일 도달 확인… 매주 반복되는 성과'],
+    line: '"이 소식은 매주 전해드리지만 매번 반갑습니다."',
+  },
+  토: {
+    headline: ['한 시민, 알람 없이 눈을 떠', '기상 시각 미상… 확인 계획 없음'],
+    line: '"기상 시각은 기록하지 않았습니다. 그럴 필요가 없었습니다."',
+  },
+  일: {
+    headline: ['한 시민, 내일을 생각하지 않기로 결정', '향후 계획 없음… 당분간 유지 방침'],
+    line: '"오늘 안에 머무는 것도 하나의 방법입니다."',
+  },
+};
+
+/** WEEKDAY 전 요일 공용 부제 */
+export const WEEKDAY_SUBTITLES: string[] = [
+  '달력은 정확했던 것으로 확인',
+  '관계자들 "그럴 만하다"',
+  '이의 제기는 없었다',
+  '다음 요일은 예정대로 진행',
+  '현장은 평소와 같았다',
+  '별도 대응 계획은 없어',
+];
+
+/** 홈 화면 요일 버튼에 노출하는 라벨(오늘 요일 하나만 표시) */
+export const WEEKDAY_HOME_LABEL: Record<Weekday, string> = {
+  월: '월요일을 통과함',
+  화: '아직 화요일임',
+  수: '절반 지점 지남',
+  목: '목요일까지 옴',
+  금: '금요일에 도착함',
+  토: '알람 없이 일어남',
+  일: '내일 생각 안 하기로 함',
+};
 
 /* ────────────────────────────────────────── */
 
@@ -496,11 +572,29 @@ export function createArticle(
 ): { article: Article; picks: LastPicks } {
   const isCustom = category === 'CUSTOM';
 
-  const headlinePool = isCustom
-    ? CUSTOM_HEADLINE_TEMPLATES
-    : BANK[category].headline;
-  const subtitlePool = isCustom ? CUSTOM_SUBTITLES : BANK[category].subtitle;
-  const expert = isCustom ? CUSTOM_EXPERT : BANK[category].expert;
+  let headlinePool: string[];
+  let subtitlePool: string[];
+  let expert: Expert;
+
+  if (category === 'CUSTOM') {
+    headlinePool = CUSTOM_HEADLINE_TEMPLATES;
+    subtitlePool = CUSTOM_SUBTITLES;
+    expert = CUSTOM_EXPERT;
+  } else if (category === 'WEEKDAY') {
+    const entry = WEEKDAY_BANK[currentWeekday()];
+    headlinePool = entry.headline;
+    subtitlePool = WEEKDAY_SUBTITLES;
+    expert = {
+      name: CUSTOM_EXPERT.name,
+      org: CUSTOM_EXPERT.org,
+      animal: CUSTOM_EXPERT.animal,
+      lines: [entry.line],
+    };
+  } else {
+    headlinePool = BANK[category].headline;
+    subtitlePool = BANK[category].subtitle;
+    expert = BANK[category].expert;
+  }
 
   const h = pick(headlinePool, last.headline);
   const s = pick(subtitlePool, last.subtitle);

@@ -14,9 +14,11 @@ import {
   CLOSING,
   DAILY_PUBLISH_LIMIT,
   PRIVACY_NOTE,
+  WEEKDAY_HOME_LABEL,
   countPublishedOn,
   createArticle,
   createFollowup,
+  currentWeekday,
   today,
   yesterday,
   type Article,
@@ -57,6 +59,8 @@ function Page() {
   const [isPublishing, setIsPublishing] = useState(false);
   const isPublishingRef = useRef(false);
   const todayStr = useTodayDate();
+  // todayStr이 로컬 자정 기준으로만 갱신되므로(useTodayDate), 별도 타이머 없이 같은 기준으로 요일을 얻는다
+  const weekday = useMemo(() => currentWeekday(), [todayStr]);
 
   useFocusEffect(
     useCallback(() => {
@@ -179,6 +183,14 @@ function Page() {
             ))}
           </View>
           <TouchableOpacity
+            style={styles.weekdayButton}
+            onPress={() => handleReport('WEEKDAY')}
+            disabled={isPublishing}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.weekdayButtonText}>{WEEKDAY_HOME_LABEL[weekday]}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
             style={styles.customButton}
             onPress={handleOpenReport}
             disabled={isPublishing}
@@ -272,6 +284,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   reportButtonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#000000',
+  },
+  weekdayButton: {
+    marginTop: 12,
+    borderWidth: 1,
+    borderColor: '#000000',
+    paddingVertical: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  weekdayButtonText: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#000000',
