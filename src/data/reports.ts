@@ -16,7 +16,7 @@ import { CATEGORIES, type Category } from './news';
 export type ReportCategory = Category;
 
 /** 서버로 보내거나 서버에서 받아도 되는 카테고리 화이트리스트 */
-const CATEGORY_WHITELIST: readonly ReportCategory[] = [...CATEGORIES, 'CUSTOM'];
+const CATEGORY_WHITELIST: readonly ReportCategory[] = [...CATEGORIES, 'CUSTOM', 'WEEKDAY'];
 
 function isReportCategory(value: unknown): value is ReportCategory {
   return typeof value === 'string' && (CATEGORY_WHITELIST as readonly string[]).includes(value);
