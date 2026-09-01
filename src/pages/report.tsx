@@ -1,10 +1,8 @@
-import { createRoute } from '@granite-js/react-native';
+import { createRoute, KeyboardAboveView } from '@granite-js/react-native';
 import { useFocusEffect } from '@granite-js/native/@react-navigation/native';
 import React, { useCallback, useRef, useState } from 'react';
 import {
   Keyboard,
-  KeyboardAvoidingView,
-  Platform,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -90,70 +88,73 @@ function Page() {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.safeArea}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <SafeAreaView style={styles.safeArea}>
-        <View style={styles.topBar}>
-          <TouchableOpacity onPress={() => navigation.goBack()} activeOpacity={0.7} hitSlop={8}>
-            <Text style={styles.back}>‹ 뒤로</Text>
-          </TouchableOpacity>
-          <Text style={styles.channelName}>{CHANNEL_NAME}</Text>
-          <View style={styles.backSpacer} />
-        </View>
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.topBar}>
+        <TouchableOpacity onPress={() => navigation.goBack()} activeOpacity={0.7} hitSlop={8}>
+          <Text style={styles.back}>‹ 뒤로</Text>
+        </TouchableOpacity>
+        <Text style={styles.channelName}>{CHANNEL_NAME}</Text>
+        <View style={styles.backSpacer} />
+      </View>
 
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View style={styles.body}>
           <ScrollView
-            contentContainerStyle={{ flexGrow: 1 }}
+            style={styles.scroll}
+            contentContainerStyle={styles.scrollContent}
             keyboardShouldPersistTaps="handled"
             keyboardDismissMode="on-drag"
           >
-            <View style={styles.content}>
-              <Text style={styles.label}>오늘 있었던 일을 직접 적어주세요</Text>
+            <Text style={styles.label}>오늘 있었던 일을 직접 적어주세요</Text>
 
-              {isLimitReached ? (
-                <View style={styles.limitNotice}>
-                  <Text style={styles.limitNoticeLine}>{CLOSING.line1}</Text>
-                  <Text style={styles.limitNoticeLine}>{CLOSING.line2}</Text>
-                </View>
-              ) : (
-                <>
-                  <Text style={styles.remainingNotice}>
-                    오늘 {remainingCount}번 더 제보할 수 있습니다
-                  </Text>
-                  <TextInput
-                    style={styles.input}
-                    value={text}
-                    onChangeText={(value) => setText(value.slice(0, MAX_LENGTH))}
-                    placeholder="예) 미루던 설거지를 끝냈다"
-                    placeholderTextColor="#999999"
-                    maxLength={MAX_LENGTH}
-                    multiline
-                    autoFocus
-                    returnKeyType="done"
-                    blurOnSubmit
-                    onSubmitEditing={Keyboard.dismiss}
-                  />
-                  <Text style={styles.counter}>
-                    {text.length}/{MAX_LENGTH}
-                  </Text>
-                </>
-              )}
-
-              <TouchableOpacity
-                style={[styles.publishButton, !canPublish && styles.publishButtonDisabled]}
-                onPress={handlePublish}
-                disabled={!canPublish}
-                activeOpacity={0.7}
-              >
-                <Text style={styles.publishButtonText}>제보하기</Text>
-              </TouchableOpacity>
-            </View>
+            {isLimitReached ? (
+              <View style={styles.limitNotice}>
+                <Text style={styles.limitNoticeLine}>{CLOSING.line1}</Text>
+                <Text style={styles.limitNoticeLine}>{CLOSING.line2}</Text>
+              </View>
+            ) : (
+              <Text style={styles.remainingNotice}>
+                오늘 {remainingCount}번 더 제보할 수 있습니다
+              </Text>
+            )}
           </ScrollView>
-        </TouchableWithoutFeedback>
-      </SafeAreaView>
-    </KeyboardAvoidingView>
+
+          {/* 입력창 + 글자수 + 버튼을 한 묶음으로 두고, 키보드가 뜨면 실제 키보드 높이만큼
+              통째로 위로 밀어 올린다 (화면 높이 계산이 아닌 키보드 이벤트 기반) */}
+          <KeyboardAboveView style={styles.keyboardAboveArea}>
+            {!isLimitReached && (
+              <>
+                <TextInput
+                  style={styles.input}
+                  value={text}
+                  onChangeText={(value) => setText(value.slice(0, MAX_LENGTH))}
+                  placeholder="예) 미루던 설거지를 끝냈다"
+                  placeholderTextColor="#999999"
+                  maxLength={MAX_LENGTH}
+                  multiline
+                  autoFocus
+                  returnKeyType="done"
+                  blurOnSubmit
+                  onSubmitEditing={Keyboard.dismiss}
+                />
+                <Text style={styles.counter}>
+                  {text.length}/{MAX_LENGTH}
+                </Text>
+              </>
+            )}
+
+            <TouchableOpacity
+              style={[styles.publishButton, !canPublish && styles.publishButtonDisabled]}
+              onPress={handlePublish}
+              disabled={!canPublish}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.publishButtonText}>제보하기</Text>
+            </TouchableOpacity>
+          </KeyboardAboveView>
+        </View>
+      </TouchableWithoutFeedback>
+    </SafeAreaView>
   );
 }
 
@@ -183,9 +184,18 @@ const styles = StyleSheet.create({
   backSpacer: {
     width: 32,
   },
-  content: {
+  body: {
     flex: 1,
+  },
+  scroll: {
+    flex: 1,
+  },
+  scrollContent: {
     padding: 20,
+  },
+  keyboardAboveArea: {
+    paddingHorizontal: 20,
+    paddingBottom: 20,
   },
   label: {
     fontSize: 16,
@@ -226,7 +236,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   publishButton: {
-    marginTop: 'auto',
+    marginTop: 16,
     borderWidth: 1,
     borderColor: '#000000',
     backgroundColor: '#000000',
