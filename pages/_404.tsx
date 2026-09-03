@@ -1,16 +1,19 @@
-import React from 'react';
-import { Text, View } from 'react-native';
+import React, { useEffect } from 'react';
+import { View } from 'react-native';
+import { CommonActions } from '@granite-js/native/@react-navigation/native';
+import { useNavigation } from '@granite-js/react-native';
 
 export default function NotFoundPage() {
-  return (
-    <View
-      style={{
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
-      <Text>404 Not Found</Text>
-    </View>
-  );
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    navigation.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [{ name: '/' }],
+      })
+    );
+  }, [navigation]);
+
+  return <View style={{ flex: 1, backgroundColor: '#FFFFFF' }} />;
 }

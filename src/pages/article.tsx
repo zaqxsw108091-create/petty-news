@@ -222,7 +222,6 @@ function Page() {
           >
             <Text style={styles.badgeText}>속보</Text>
           </Animated.View>
-          <Text style={styles.channelName}>{CHANNEL_NAME}</Text>
         </View>
         <Text style={styles.time}>{publishedAt}</Text>
       </View>
@@ -338,11 +337,6 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontWeight: 'bold',
     fontSize: 13,
-  },
-  channelName: {
-    fontWeight: 'bold',
-    fontSize: 14,
-    color: '#000000',
   },
   time: {
     fontSize: 13,
