@@ -231,7 +231,6 @@ const styles = StyleSheet.create({
   },
   followup: {
     borderTopWidth: 1,
-    borderBottomWidth: 1,
     borderColor: '#000000',
     paddingVertical: 14,
     marginBottom: 24,
