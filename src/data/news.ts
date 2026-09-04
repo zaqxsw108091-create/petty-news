@@ -74,7 +74,7 @@ export const CLOSING = {
 export const DAILY_PUBLISH_LIMIT = 3;
 
 export const EMPTY_ARCHIVE = '아직 보도된 소식이 없습니다. 오늘의 제보를 기다립니다.';
-export const PRIVACY_NOTE = '이 앱은 어떤 개인정보도 수집하지 않습니다';
+export const PRIVACY_NOTE = '이 앱은 이름·연락처 등 개인정보를 수집하지 않습니다 (제보 카테고리만 익명 집계)';
 
 /* ────────────────────────────────────────── */
 

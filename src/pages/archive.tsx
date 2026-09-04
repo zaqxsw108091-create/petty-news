@@ -91,13 +91,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 20,
     paddingBottom: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#000000',
   },
   homeLinkText: {
     fontSize: 13,
     fontWeight: 'bold',
     color: '#000000',
+    textDecorationLine: 'underline',
   },
   countText: {
     marginTop: 8,

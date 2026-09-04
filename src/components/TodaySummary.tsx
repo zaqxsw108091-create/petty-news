@@ -62,7 +62,15 @@ export function TodaySummary() {
     return () => removers.forEach((remove) => remove());
   }, [rows]);
 
-  if (!rows || rows.length === 0) return null;
+  if (rows && rows.length === 0) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.title}>오늘의 집계</Text>
+        <Text style={styles.emptyText}>아직 오늘 접수된 제보가 없습니다</Text>
+      </View>
+    );
+  }
+  if (!rows) return null;
 
   return (
     <View style={styles.container}>
@@ -100,5 +108,9 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: 'bold',
     color: '#E01B1B',
+  },
+  emptyText: {
+    fontSize: 13,
+    color: '#999999',
   },
 });
