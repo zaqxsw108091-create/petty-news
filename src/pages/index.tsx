@@ -49,6 +49,16 @@ function useTodayDate(): string {
     return () => clearTimeout(timer);
   }, [todayStr]);
 
+  // 앱이 자정을 넘겨 백그라운드에 머무르면 위 setTimeout이 지연/누락될 수 있다.
+  // 화면이 다시 포커스될 때마다 today()로 재검증해, 그런 경우에도 날짜가 어긋난 채
+  // 남아있지 않도록 한다.
+  useFocusEffect(
+    useCallback(() => {
+      const current = today();
+      setTodayStr((prev) => (prev !== current ? current : prev));
+    }, [])
+  );
+
   return todayStr;
 }
 
