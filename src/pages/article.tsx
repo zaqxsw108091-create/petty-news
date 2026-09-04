@@ -215,6 +215,12 @@ function Page() {
     <SafeAreaView style={styles.safeArea}>
       <Animated.View pointerEvents="none" style={[styles.flashOverlay, { opacity: flashOpacity }]} />
 
+      <View style={styles.topHomeLinkRow}>
+        <TouchableOpacity onPress={handleGoHome} activeOpacity={0.7}>
+          <Text style={styles.topHomeLinkText}>보도국으로</Text>
+        </TouchableOpacity>
+      </View>
+
       <View style={styles.topBar}>
         <View style={styles.topBarLeft}>
           <Animated.View
@@ -313,6 +319,17 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     backgroundColor: '#F04452',
     zIndex: 10,
+  },
+  topHomeLinkRow: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 12,
+  },
+  topHomeLinkText: {
+    fontSize: 13,
+    fontWeight: 'bold',
+    color: '#000000',
+    textDecorationLine: 'underline',
   },
   topBar: {
     flexDirection: 'row',
