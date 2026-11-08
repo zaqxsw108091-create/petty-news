@@ -21,3 +21,9 @@ yarn-error.log
 
 # 원본 PNG. base64로 인라인 처리해 src/data/characterImages.ts에 이미 포함됨
 /assets/
+
+# 개인 작업 메모 (공개 저장소에 올리지 않음)
+BUILD_GUIDE.md
+CLAUDE.md
+*_CLAUDE.md
+.github/copilot-instructions.md
