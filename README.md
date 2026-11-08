@@ -11,3 +11,17 @@
 
 ## 미니앱 사용해보기
 토스 앱에서 '하찮은 속보' 검색
+
+## 기술 스택
+
+- **앱인토스 프레임워크 + Granite** (`@apps-in-toss/framework`, `@granite-js/react-native`), React Native 0.84 · React 19.2 · TypeScript
+- **화면**: 홈(뉴스룸), 속보 상세, 보관함, 제보 (`pages/` 폴더 4개 + 404)
+- **로컬 저장**: 보관함 최대 100건 (기기 내 저장)
+- **서버**: Supabase REST — 카테고리별 집계용 `reports` 테이블. 앱에는 공개용 `anon` 키만 들어 있고, 접근 제한은 Supabase의 RLS 정책에 의존합니다.
+- **점검**: `tsc --noEmit`, `eslint .` 통과 (자동 테스트 파일은 없음)
+
+## 문서
+
+- `SPEC.md` — 개발 시작 시점의 개발 명세(설계 문서). 최종 구현과 다를 수 있습니다.
+- `BUILD_GUIDE.md` — 개발 당시의 작업 가이드·일정·체크리스트.
+
