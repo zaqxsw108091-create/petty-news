@@ -26,9 +26,7 @@ async function fetchWithTimeout(url: string, init: RequestInit): Promise<Respons
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), SUPABASE_FETCH_TIMEOUT_MS);
   try {
-    // @apps-in-toss/plugin-compat가 react-native를 중첩 설치해 AbortSignal 전역 타입이
-    // 두 벌 존재한다. 런타임에는 동일한 표준 AbortSignal이라 문제 없어 signal만 캐스팅한다.
-    const response = await fetch(url, { ...init, signal: controller.signal as RequestInit['signal'] });
+    const response = await fetch(url, { ...init, signal: controller.signal });
     return response;
   } catch {
     return null;

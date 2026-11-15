@@ -16,10 +16,7 @@ jobs:
         run: |
           set -euo pipefail
           URL="https://mjqcdstxibcjubsrbtow.supabase.co/rest/v1/reports?select=category&limit=1"
-          KEY="$(grep -o "eyJ[A-Za-z0-9_.-]*" <<< "${{ vars.SUPABASE_ANON_KEY || '' }}" || true)"
-          if [ -z "$KEY" ]; then
-            echo "repo variable SUPABASE_ANON_KEY가 필요합니다 (Settings > Secrets and variables > Actions > Variables)"; exit 1
-          fi
+          KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1qcWNkc3R4aWJjanVic3JidG93Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1Njg0NTgsImV4cCI6MjEwMzE0NDQ1OH0.j7I3Vd0fNdTaIzp32eXdQmHctwN_ZsSviB5OOwykNu8"
           code=$(curl -sS -o /dev/null -w '%{http_code}' --retry 3 --max-time 20 \
             -H "apikey: $KEY" -H "Authorization: Bearer $KEY" "$URL")
           echo "HTTP $code"

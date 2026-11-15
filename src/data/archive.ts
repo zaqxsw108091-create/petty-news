@@ -1,4 +1,4 @@
-import { Storage } from '@apps-in-toss/native-modules';
+import { Storage } from '@apps-in-toss/web-framework';
 import type { Article } from './news';
 
 // SPEC 7.1

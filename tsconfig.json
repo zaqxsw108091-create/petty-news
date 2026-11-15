@@ -1,17 +1,17 @@
 {
   "compilerOptions": {
-    "rootDir": ".",
-    "baseUrl": "src",
-    "target": "ESNext",
+    "target": "ES2022",
+    "module": "ESNext",
     "moduleResolution": "bundler",
-    "lib": ["ESNext"],
-    "types": ["react-native"],
-    "jsx": "react-native",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "types": ["vite/client"],
+    "jsx": "react-jsx",
+    "baseUrl": "src",
+    "noEmit": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "isolatedModules": true,
     "strict": true,
-    "allowJs": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
@@ -20,5 +20,5 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true
   },
-  "include": ["**/*.ts", "**/*.tsx"]
+  "include": ["src", "*.ts"]
 }
