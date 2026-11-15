@@ -1,0 +1,26 @@
+# Supabase 무료 프로젝트는 7일간 요청이 없으면 일시 중지(pause)된다.
+# 3일마다 reports 테이블을 읽어 활동으로 인정받게 한다.
+# anon 키는 공개 전제 키(RLS 보호)라 src/config/supabase.ts와 동일 값을 그대로 쓴다.
+name: supabase-keepalive
+
+on:
+  schedule:
+    - cron: '17 3 */3 * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase REST
+        run: |
+          set -euo pipefail
+          URL="https://mjqcdstxibcjubsrbtow.supabase.co/rest/v1/reports?select=category&limit=1"
+          KEY="$(grep -o "eyJ[A-Za-z0-9_.-]*" <<< "${{ vars.SUPABASE_ANON_KEY || '' }}" || true)"
+          if [ -z "$KEY" ]; then
+            echo "repo variable SUPABASE_ANON_KEY가 필요합니다 (Settings > Secrets and variables > Actions > Variables)"; exit 1
+          fi
+          code=$(curl -sS -o /dev/null -w '%{http_code}' --retry 3 --max-time 20 \
+            -H "apikey: $KEY" -H "Authorization: Bearer $KEY" "$URL")
+          echo "HTTP $code"
+          [ "$code" = "200" ]
