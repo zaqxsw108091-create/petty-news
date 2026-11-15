@@ -4,16 +4,12 @@ import pluginReact from 'eslint-plugin-react';
 
 /** @type {import('eslint').Linter.Config[]} */
 export default [
-  { ignores: ['**/node_modules/**', '**/dist/**', '**/.granite/**', '**/*.gen.ts', '*.{cjs,js}'] },
-  { files: ['pages/**/*.{ts,jsx,tsx}', 'src/**/*.{ts,jsx,tsx}'] },
+  { ignores: ['**/node_modules/**', '**/dist/**', '*.{cjs,js}', '*.ait'] },
   pluginJs.configs.recommended,
   ...tseslint.configs.recommended,
   {
-    settings: {
-      react: {
-        version: 'detect',
-      },
-    },
+    settings: { react: { version: 'detect' } },
   },
   pluginReact.configs.flat.recommended,
+  pluginReact.configs.flat['jsx-runtime'],
 ];

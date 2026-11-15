@@ -27,3 +27,5 @@ BUILD_GUIDE.md
 CLAUDE.md
 *_CLAUDE.md
 .github/copilot-instructions.md
+
+*.ait

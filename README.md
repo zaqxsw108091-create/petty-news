@@ -14,11 +14,13 @@
 
 ## 기술 스택
 
-- **앱인토스 프레임워크 + Granite** (`@apps-in-toss/framework`, `@granite-js/react-native`), React Native 0.84 · React 19.2 · TypeScript
-- **화면**: 홈(뉴스룸), 속보 상세, 보관함, 제보 (`pages/` 폴더 4개 + 404)
+- **앱인토스 WebView 미니앱 (SDK 3.x)** (`@apps-in-toss/web-framework`), Vite · React 18 · TypeScript
+  - 2026.11 SDK 2.x 종료 공지에 따라 React Native(Granite)에서 WebView로 전환했습니다
+- **화면**: 홈(뉴스룸), 속보 상세, 보관함, 제보 (`src/pages/` 4개)
 - **로컬 저장**: 보관함 최대 100건 (기기 내 저장)
 - **서버**: Supabase REST — 카테고리별 집계용 `reports` 테이블. 앱에는 공개용 `anon` 키만 들어 있고, 접근 제한은 Supabase의 RLS 정책에 의존합니다.
-- **점검**: `tsc --noEmit`, `eslint .` 통과 (자동 테스트 파일은 없음)
+- **개발/빌드**: `npm run dev`(로컬 브라우저 + devtools), `npm run build`(`pettynews.ait` 생성), `npm run typecheck`, `npm run lint`
+- **Supabase 유지**: 무료 프로젝트 자동 중지를 막기 위해 `.github/workflows/supabase-keepalive.yml`이 3일마다 조회합니다
 
 ## 문서
 
